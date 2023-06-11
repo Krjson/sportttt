@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Авторизация и регистрация</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/css/bootstrap.min.css">
+  <link rel="stylesheet" type="text/css" href="/css/preloader.css">
+  <style>
+    /* Добавляем стили для плавного появления элементов */
+    #content {
+      opacity: 0;
+      transition: opacity 1s ease-in-out;
+    }
+
+    body {
+      background-color: #444654;
+    }
+
+    .tabs {
+      border-radius: 10px;
+      padding: 25px;
+      background-color: #ffffff;
+      color: #000000;
+    }
+
+    .nav-tabs {
+      grid-gap: 0 25px;
+    }
+
+    .nav-item {
+      border: 1px solid transparent;
+      border-top-left-radius: 0.25rem;
+      border-top-right-radius: 0.25rem;      
+      border-color: #e9ecef #e9ecef #dee2e6;
+    }
+
+    .tabs .nav-link {
+      color: #000000;
+      transition: background-color 0.3s ease;
+    }
+
+    .tabs .nav-link.active {
+      background-color: #007bff;
+      color: #ffffff;
+    }
+    
+    .tabs .nav-link:hover {
+      background-color: #e9ecef;
+      color: #000000;
+    }
+    
+    .tab-pane {
+      transition: opacity 0.3s ease;
+    }
+
+    .tab-pane.active {
+      opacity: 1;
+    }
+    
+    .tab-content h1 {
+      color: #ffffff;
+    }
+    
+    .tab-content p {
+      color: #000000;
+    }
+    
+    @media (max-width: 767px) {
+      .tabs {
+        padding: 15px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div id="preloader" class="preloader">
+    <div class="loader"></div>
+    <div class="progreses">0%</div>
+  </div>
+
+  <div id="content" style="display: none;">
+    <div class="container">
+      <h1 style="color: #ffffff;">Авторизация и регистрация</h1>
+      <% if (errors && errors.length > 0) { %>
+        <div class="alert alert-danger" role="alert">
+          <% for (let i = 0; i < errors.length; i++) { %>
+            <p><%= errors[i].msg %></p>
+          <% } %>
+        </div>
+      <% } %>
+
+   
+      <div class="tabs">
+        <ul class="nav nav-tabs">
+          <li class="nav-item">
+            <a class="nav-link active" id="login-tab" data-bs-toggle="tab" href="#login">Авторизация</a>
+          </li>
+          <li class="nav-item">
+            <a class="nav-link" id="register-tab" data-bs-toggle="tab" href="#register">Регистрация</a>
+          </li>
+        </ul>
+        <div class="tab-content">
+          <div class="tab-pane fade show active" id="login">
+            <form id="login" action="/login" method="POST">
+                <div class="mb-3">
+                  <label for="loginUsername" class="form-label">Логин</label>
+                  <input type="text" class="form-control" id="loginUsername" name="loginUsername" required>
+                </div>
+                <div class="mb-3">
+                  <label for="loginPassword" class="form-label">Пароль</label>
+                  <input type="password" class="form-control" id="loginPassword" name="loginPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Отправить</button>
+              </form>
+              
+            <p>Еще нет аккаунта? <a href="#register" class="nav-link switch-tab">Регистрация</a></p>
+          </div>
+
+          <div class="tab-pane fade" id="register">
+            <form action="/register" method="POST" onsubmit="return handleRegistrationFormSubmit(event)">
+
+                <div class="mb-3">
+                  <label for="registerUsername" class="form-label">Логин</label>
+                  <input type="text" class="form-control" id="registerUsername" name="registerUsername" required>
+                </div>
+                <div class="mb-3">
+                  <label for="registerFirstName" class="form-label">Имя</label>
+                  <input type="text" class="form-control" id="registerFirstName" name="registerFirstName" required>
+                </div>
+                <div class="mb-3">
+                  <label for="registerLastName" class="form-label">Фамилия</label>
+                  <input type="text" class="form-control" id="registerLastName" name="registerLastName" required>
+                </div>
+                <div class="mb-3">
+                  <label for="registerClass" class="form-label">Класс</label>
+                  <input type="text" class="form-control" id="registerClass" name="registerClass" required>
+                </div>
+                <div class="mb-3">
+                  <label for="registerEmail" class="form-label">Email</label>
+                  <input type="email" class="form-control" id="registerEmail" name="registerEmail" required>
+                </div>
+                <div class="mb-3">
+                  <label for="registerPassword" class="form-label">Пароль</label>
+                  <input type="password" class="form-control" id="registerPassword" name="registerPassword" required>
+                </div>
+                <div class="mb-3">
+                  <label for="registerConfirmPassword" class="form-label">Повторите пароль</label>
+                  <input type="password" class="form-control" id="registerConfirmPassword" name="registerConfirmPassword" required>
+                </div>
+                <button type="submit" class="btn btn-primary">Отправить</button>
+              </form>
+              
+            <p>У вас уже есть аккаунт? <a href="#login" class="nav-link switch-tab">Авторизация</a></p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.1/js/bootstrap.bundle.min.js"></script>
+  <script>
+ function handleLoginFormSubmit(event) {
+  event.preventDefault();
+
+  const loginUsername = document.getElementById('loginUsername').value;
+  const loginPassword = document.getElementById('loginPassword').value;
+
+  // Отправка данных на сервер для проверки
+  console.log('Отправляемые данные:', { loginUsername, loginPassword }); // Добавленный вывод в консоль
+
+  const requestData = {
+    loginUsername,
+    loginPassword
+  };
+
+  fetch('/login', {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(requestData)
+  })
+    .then(response => response.json())
+    .then(data => {
+      console.log('Полученные данные:', data); // Добавленный вывод в консоль
+
+      handleLoginResponse(data); // Обработка ответа от сервера
+    })
+    .catch(error => {
+      console.log(error);
+      alert('Произошла ошибка. Пожалуйста, попробуйте еще раз.');
+    });
+}
+
+// Обработка ответа от сервера
+function handleLoginResponse(responseData) {
+  if (responseData.success) {
+    // Успешная авторизация
+    alert('Успешная авторизация');
+    window.location.href = '/dashboard'; // Редирект на главную страницу при успешной авторизации
+  } else {
+    // Неуспешная авторизация
+    alert('Данные не верны. Пожалуйста, проверьте свои данные и попробуйте снова.');
+  }
+}
+
+
+// Добавление обработчика события отправки формы
+const loginForm = document.getElementById('login');
+loginForm.addEventListener('submit', handleLoginFormSubmit);
+
+function handleRegistrationFormSubmit(event) {
+  event.preventDefault();
+
+  const registerUsername = document.getElementById('registerUsername').value;
+  const registerEmail = document.getElementById('registerEmail').value;
+  const registerPassword = document.getElementById('registerPassword').value;
+  const registerConfirmPassword = document.getElementById('registerConfirmPassword').value;
+  const registerFirstName = document.getElementById('registerFirstName').value;
+  const registerLastName = document.getElementById('registerLastName').value;
+  const registerClass = document.getElementById('registerClass').value;
+
+  // Проверка, что все поля заполнены
+  if (registerUsername === '' || registerEmail === '' || registerPassword === '' || registerConfirmPassword === '' || registerFirstName === '' || registerLastName === '' || registerClass === '') {
+    alert('Пожалуйста, заполните все поля');
+  } else {
+    // Отправка данных на сервер для проверки
+    const requestData = {
+      registerUsername,
+      registerEmail,
+      registerPassword,
+      registerConfirmPassword,
+      registerFirstName,
+      registerLastName,
+      registerClass
+    };
+
+    fetch('/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(requestData)
+    })
+      .then(response => response.json())
+      .then(data => {
+        console.log('Полученные данные:', data);
+
+        handleRegistrationResponse(data);
+      })
+      .catch(error => {
+        console.log(error);
+        alert('Произошла ошибка. Пожалуйста, попробуйте еще раз.');
+      });
+  }
+}
+
+
+function handleRegistrationResponse(responseData) {
+  if (responseData.errors) {
+    // Обработка ошибок, полученных от сервера
+    console.log('Ошибки:', responseData.errors);
+
+    // Вывод ошибок в консоль
+    responseData.errors.forEach(error => {
+      console.log(`Тип: ${error.type}, Сообщение: ${error.msg}, Поле: ${error.path}, Местоположение: ${error.location}`);
+    });
+
+    alert('Пожалуйста, исправьте ошибки в форме');
+  } else if (responseData.success) {
+    alert('Вы успешно зарегистрировались. Пожалуйста, авторизуйтесь, чтобы пользоваться всем функционалом сайта.');
+    window.location.href = '/';
+  } else {
+    alert('Произошла ошибка. Пожалуйста, попробуйте еще раз.');
+  }
+}
+
+
+
+    window.addEventListener('load', function() {
+      let preloader = document.getElementById('preloader');
+      let content = document.getElementById('content');
+      let progress = document.querySelector('.progreses');
+      let counter = 0;
+
+      function updateProgress() {
+        counter++;
+        progress.textContent = counter + '%';
+
+        if (counter === 100) {
+          clearInterval(interval);
+          preloader.style.display = 'none';
+          content.style.display = 'block';
+          setTimeout(function() {
+            content.style.opacity = 1;
+          }, 500); // Добавляем задержку перед появлением контента
+        }
+      }
+
+      // Эмуляция загрузки контента
+      let interval = setInterval(updateProgress, 30);
+
+      // Опционально: прекращение эмуляции загрузки после 3 секунд
+      setTimeout(function() {
+        clearInterval(interval);
+        preloader.style.display = 'none';
+        content.style.display = 'block';
+        setTimeout(function() {
+          content.style.opacity = 1;
+        }, 500); // Добавляем задержку перед появлением контента
+      }, 3000);
+
+      // Обработчик события для переключения табов по ссылкам
+      let switchTabs = document.querySelectorAll('.switch-tab');
+      switchTabs.forEach(function(tab) {
+        tab.addEventListener('click', function(e) {
+          e.preventDefault();
+          let target = this.getAttribute('href');
+          document.querySelector('.nav-link.active').classList.remove('active');
+          document.querySelector('.tab-pane.active').classList.remove('active');
+          document.querySelector(target + '-tab').classList.add('active');
+          document.querySelector(target).classList.add('active');
+        });
+      });
+
+       
+    });
+  </script>
+</body>
+</html>

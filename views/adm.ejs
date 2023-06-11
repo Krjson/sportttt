@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.2/css/bootstrap.min.css">
+  <style>
+    body {
+      background-color: #444654;
+      color: #ffffff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: space-between;
+      min-height: 100vh;
+      flex-direction: column;
+    }
+
+    .table {
+        color: #fff;
+    }
+    .header {
+      background-color: #007bff;
+      padding: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .header__logo {
+      font-weight: bold;
+      font-size: 20px;
+    }
+    .header__navigation {
+      display: flex;
+      align-items: center;
+    }
+    .header__navigation a {
+      color: #ffffff;
+      text-decoration: none;
+      margin-right: 10px;
+      transition: color 0.3s ease;
+    }
+    .header__navigation a:hover {
+      color: #ffcc00;
+    }
+ 
+    .main-content {
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: calc(100vh - 130px);
+    }
+    .video {
+      margin-bottom: 20px;
+      max-width: 100%;
+    }
+    .footer {
+      background-color: #007bff;
+      padding: 10px;
+      text-align: center;
+    }
+
+    @media (max-width: 576px) {
+      .header {
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+      .header__navigation {
+        margin-top: 10px;
+      }
+      .header__user-links {
+        display: none;
+      }
+    }
+    .header__navigation .activeee {
+        color: #ffcc00;
+
+    }
+  </style>
+   <script>
+    function logout() {
+      fetch('/logout', { method: 'GET' })
+        .then(response => {
+          if (response.redirected) {
+            window.location.href = response.url;
+          }
+        })
+        .catch(error => {
+          console.error('Ошибка при выходе:', error);
+        });
+    }
+  </script>
+</head>
+<body>
+  <div class="header">
+    <div class="header__logo">
+      Физкультура
+    </div>
+    <div class="header__navigation">
+      <a href="/security">Техника безопасности</a>
+      <a href="/set">Настройки</a>
+      <div class="header__user">
+        <% if (user.role === 'admin') { %>
+            <a href="/adm">Админ панель</a>
+          <% } %>
+        <a href="#" onclick="logout()">Выйти</a>
+    </div>
+    </div>
+  </div>
+
+  <div class="container">
+    <h1>Страница администратора</h1>
+
+    <h2>Все результаты тестирования:</h2>
+    <% if (testResults.length > 0) { %>
+      <table class="table">
+        <tr>
+          <th>Имя</th>
+          <th>Фамилия</th>
+          <th>Класс</th>
+          <th>Дата прохождения</th>
+          <th>Результат</th>
+        </tr>
+        <% testResults.forEach(result => { %>
+          <tr>
+            <td><%= result.userId.firstName %></td>
+            <td><%= result.userId.lastName %></td>
+            <td><%= result.userId.className %></td>
+            <td><%= result.date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric', hour: 'numeric', minute: 'numeric' }) %></td>
+            <td><%= result.result.toFixed(2) %>%</td>
+          </tr>
+        <% }) %>
+      </table>
+    <% } else { %>
+      <p>Нет доступных результатов тестирования</p>
+    <% } %>
+  </div>
+
+  <div class="footer">
+    Заказчик Володин Евгений Александрович, Исполнитель Лукавский Виктор Анатольевич, руководитель Баймухан Айбек Болатбекович.
+  </div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/5.0.2/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
